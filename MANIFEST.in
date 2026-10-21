@@ -1,8 +1,17 @@
+include SKILL.md
 include README.md
+include EXECUTION_CHECKLIST.md
+include DISTRIBUTION.md
+include SECURITY.md
+include RELEASE_NOTES.md
+include .env.example
+include .gitattributes
 include LICENSE
 include CHANGELOG.md
+recursive-include .github *.yml
 recursive-include references *.md
 recursive-include examples *.md
 recursive-include examples *.json
+recursive-include scripts *.py
 recursive-include scripts/config *.json
 recursive-include tests *

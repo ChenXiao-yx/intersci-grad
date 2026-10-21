@@ -1,4 +1,4 @@
-# InterSci-KD 修订日志（版本历史）
+# InterSci-Grad 修订日志（版本历史，原名 InterSci-KD）
 
 **v3.x 早期版本**：实验性版本，references/与scripts/分离目录设计，主文件松散无统一章节。v4.x向后兼容evidence-rubric.md与output-template.md，旧证据表/简报可复用。
 
@@ -189,4 +189,20 @@
 109. 📁 debug-evidence-audit-runtime.md 归档至 docs/debug/（docs/ 本就是 gitignore 的内部文档目录）；.gitignore 移除根目录专属条目，新位置由 docs/ 规则覆盖。
 110. 🚀 部署同步（点评 P0）：已安装副本（~/.trae-cn/skills/intersci-kd）长期滞留 v4.5.1 时代旧版（532 行 SKILL.md、无 tests/config/providers/quality_judge），按「已安装副本必须与工作区同源」原则 robocopy 镜像同步（排除 .git/.env/缓存），同步后在安装目录跑 check_consistency 验收。
 
-**当前版本：4.9.1-skill**（与 SKILL.md frontmatter、pyproject.toml 三处一致，由 scripts/check_consistency.py 对账；变更历史只追加不改写）
+**v5.0.0-skill（2026-10-21）：从"产业尽调引擎"转向"研究生科研副驾"（大版本，10 项）**
+
+111. 🎯 定位重写：SKILL.md 从十章技术尽调改为研究生科研副驾，默认产物从"多档简报"改为一页行动备忘（结论先行 + 三条路 + 今天/本周/两周动作）。
+112. 🧭 七种工作流：进度体检、选题收敛、文献地图、开题/中期/答辩、实验设计与排查、写作/投稿/返修、组会与导师沟通。
+113. 🚦 判断标准替换：三闸口（新颖性/可行性/时间）、四种合法创新、最小可发表单元（MPU），替代以临床证据金字塔为中心的三选一矩阵（旧版保留）。
+114. 📖 新增 references/grad-playbook.md：痛点地图（学生原话→真实卡点→先做什么）、选题拆分、三遍读法、七句逻辑链、评委 12 问、baseline 三件套、失败排查顺序、导师话术翻译表、倒推与心理边界。
+115. 🧩 新增 references/artifact-templates.md：选题卡、开题一页纸、文献矩阵、单篇精读卡、实验设计卡、组会提纲、周报、选刊表、审稿回复表，共 9 套可复制模板。
+116. 🔐 新增 references/evidence-and-integrity.md：三级标签（文献/经验/推测）、引用核验 SOP、检索留痕、禁止话术对照、数字规范、AI 使用边界。
+117. ✅ 新增 scripts/validate_grad.py：十条检查（一句话判断、下一步三档、依据标签、引用格式、过度承诺、内部黑话、末尾说明、代写表述、占位符、动作具体性），纯标准库、退出码 0/1/2。
+118. 🧪 新增 tests/test_validate_grad.py（23 条测试）+ examples/grad/ 六份黄金样例；v5.0.0 全量测试 165 条（含 3 个实网用例）。
+119. 🗂️ 旧版能力归档：原 SKILL.md 存为 references/legacy-rd-engine.md；output-template.md、evidence-rubric.md、score_evidence.py、validate_output.py 及原有测试全部保留不动，产业尽调仍可运行。
+120. 📝 README 与 EXECUTION_CHECKLIST 重写为研究生入口；版本号升至 5.0.0（SKILL.md / pyproject.toml / 本日志三处同步）。
+121. 📦 发布整理：项目名统一为 `intersci-grad`；新增 `SECURITY.md`、`RELEASE_NOTES.md`、`.github/workflows/ci.yml`、`scripts/make_release.py`；发布包自动排除 `.env` / `tests` / `docs` / 缓存，并做密钥扫描。
+122. 🧪 CI 离线稳定：设置 `SKIP_NETWORK_TESTS=1` 时跳过实网用例，避免多平台 CI 因外部网络抖动误报。
+123. 🔐 密钥边界：`.env.example` 明确“核心功能不需要 Key，仅旧版 SCP 工具可选”；安装与发布流程都显式排除 `.env`。
+
+**当前版本：5.0.0-skill**（与 SKILL.md frontmatter、pyproject.toml 三处一致，由 scripts/check_consistency.py 对账；变更历史只追加不改写）

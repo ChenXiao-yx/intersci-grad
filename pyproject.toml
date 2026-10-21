@@ -3,13 +3,13 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "intersci-kd"
-version = "4.9.1"
-description = "跨学科知识蒸馏 Skill - 确定性证据计分与档位感知校验"
+name = "intersci-grad"
+version = "5.0.0"
+description = "研究生科研副驾 Skill - 结论先行、可执行下一步与引用可核验"
 readme = "README.md"
 requires-python = ">=3.8"
 license = {text = "MIT"}
-authors = [{name = "InterSci-KD"}]
+authors = [{name = "InterSci-Grad"}]
 dependencies = ["requests>=2.31.0"]
 
 [project.optional-dependencies]

@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+    tags: ["v*"]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: py${{ matrix.python-version }} / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, windows-2022, macos-latest]
+        python-version: ["3.8", "3.12"]
+        exclude:
+          # macOS arm64 上 3.8 的预编译包不稳定，3.12 覆盖 macOS 即可
+          - os: macos-latest
+            python-version: "3.8"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r scripts/requirements.txt pytest
+      - name: Consistency check
+        run: python scripts/check_consistency.py
+      - name: Tests (offline)
+        env:
+          SKIP_NETWORK_TESTS: "1"
+        run: python -m pytest -q
+      - name: Release bundle self-check
+        run: python scripts/make_release.py --check-only
+
+  release:
+    name: Build release bundle
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build zip
+        run: python scripts/make_release.py
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: intersci-grad-release
+          path: |
+            dist/*.zip
+            dist/SHA256SUMS.txt

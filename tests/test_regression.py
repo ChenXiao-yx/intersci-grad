@@ -25,7 +25,12 @@ import search_papers
 
 
 def _network_available():
-    """第八点评 #4：实网测试防抖——离线 CI/无网环境跳过，而不是 flaky。"""
+    """第八点评 #4：实网测试防抖——离线 CI/无网环境跳过，而不是 flaky。
+
+    显式设置 SKIP_NETWORK_TESTS=1 可强制跳过，供 CI 稳定运行。
+    """
+    if os.environ.get("SKIP_NETWORK_TESTS", "").strip().lower() in {"1", "true", "yes", "on"}:
+        return False
     import socket
     try:
         socket.create_connection(("api.crossref.org", 443), timeout=3).close()

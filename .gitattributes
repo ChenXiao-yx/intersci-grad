@@ -1,0 +1,15 @@
+# 统一换行与编码，避免 Windows / macOS / Linux 协作时整文件 diff
+* text=auto
+
+*.md text eol=lf
+*.py text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.toml text eol=lf
+*.in text eol=lf
+*.txt text eol=lf
+
+*.png binary
+*.jpg binary
+*.zip binary
