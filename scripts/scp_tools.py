@@ -29,6 +29,7 @@ from typing import Optional
 # ──────────────────────────────────────────────────────────────────────
 
 BASE_URL = "https://scp.intern-ai.org.cn/api/v1"
+MCP_PROTOCOL_VERSION = "2025-06-18"
 
 
 def _extract_year(item: dict, *field_names) -> Optional[int]:
@@ -903,7 +904,7 @@ def _mcp_initialize(endpoint_url, headers):
     """MCP 初始化握手。"""
     import requests
     init_params = {
-        "protocolVersion": "2025-06-18",
+        "protocolVersion": MCP_PROTOCOL_VERSION,
         "capabilities": {},
         "clientInfo": {"name": "intersci-kd", "version": "2.0"}
     }
@@ -1036,6 +1037,9 @@ def call_gateway(tool_name: str, query: str, top_k: int, max_retries: int = 1) -
         "SCP-HUB-API-KEY": api_key,
         "Content-Type": "application/json",
         "Accept": "application/json",
+        # MCP Streamable HTTP 规范要求初始化后的每个请求都带协议版本；
+        # 缺失时网关会返回 -32602 Invalid params（表现为 parse_error）。
+        "MCP-Protocol-Version": MCP_PROTOCOL_VERSION,
     }
 
     extra = dict(extra_cfg) if extra_cfg else {}

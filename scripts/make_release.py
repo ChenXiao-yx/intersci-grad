@@ -4,7 +4,10 @@
 - Collects only runtime files (SKILL.md, references, scripts, examples, docs).
 - Excludes .env, tests, docs, caches and other development-only files.
 - Scans for hardcoded credentials and refuses to build on a hit.
-- Writes dist/<name>-v<version>.zip plus dist/SHA256SUMS.txt.
+- Rejects binary / non-UTF-8 payloads, so the bundle passes text-only review.
+- Writes dist/intersci-grad-v<version>.zip plus dist/SHA256SUMS.txt.
+  The zip's single top-level directory is `intersci-grad/` (must equal the
+  frontmatter `name`, otherwise DSH cannot discover the skill after unzip).
 
 Usage:
     python scripts/make_release.py --check-only   # CI: validate, write nothing
@@ -56,6 +59,9 @@ ROOT_FILES = [
 ]
 
 INCLUDE_DIRS = ["references", "scripts", "examples"]
+
+# 发布包内唯一的顶层目录名，必须与 SKILL.md frontmatter 的 name 一致。
+BUNDLE_DIR = "intersci-grad"
 
 EXCLUDE_DIRS = {
     ".git", ".pytest_cache", "__pycache__", "tests", "docs", "dist",
@@ -160,6 +166,28 @@ def _check_versions(root: Path, skill_text: str) -> List[str]:
     return issues
 
 
+def _check_text(root: Path, files: List[Path]) -> List[str]:
+    """确认每个待发布文件都是真实 UTF-8 文本。
+
+    平台侧会按“内容与后缀是否相符”审核：带 NUL 的文件、或无法按 UTF-8
+    解码的文件会被判成“二进制 / 压缩包伪装成文本”。这里提前拦住，
+    避免打包成功、上传后才被驳回。
+    """
+    issues = []
+    for path in files:
+        data = path.read_bytes()
+        if b"\x00" in data:
+            issues.append("二进制文件（含 NUL 字节）: %s" % path.relative_to(root))
+            continue
+        try:
+            data.decode("utf-8")
+        except UnicodeDecodeError as exc:
+            issues.append(
+                "非 UTF-8 文本: %s（第 %d 字节）" % (path.relative_to(root), exc.start)
+            )
+    return issues
+
+
 def _report(check_only: bool, version: str, files: List[Path], findings: List[Tuple[str, str, int]]) -> int:
     print("Release check: intersci-grad v%s" % version)
     print("  runtime files: %d" % len(files))
@@ -169,14 +197,14 @@ def _report(check_only: bool, version: str, files: List[Path], findings: List[Tu
             print("    - %s in %s:%s" % (kind, path, line))
         return 1
     print("  secret findings: 0")
+    print("  text check: all %d files are valid UTF-8 (no NUL bytes)" % len(files))
     if check_only:
         print("OK: bundle is clean (no files written)")
     return 0
 
 
 def _build(root: Path, out_dir: Path, version: str, files: List[Path]) -> Tuple[Path, str]:
-    name = "intersci-grad-v%s" % version
-    build_dir = out_dir / name
+    build_dir = out_dir / BUNDLE_DIR
     if build_dir.exists():
         shutil.rmtree(build_dir)
     for src in files:
@@ -188,14 +216,17 @@ def _build(root: Path, out_dir: Path, version: str, files: List[Path]) -> Tuple[
     leaked = [path for path in build_dir.rglob(".env") if path.is_file()]
     if leaked:
         raise RuntimeError(".env leaked into release bundle: %s" % leaked[0])
+    leaked_git = [path for path in build_dir.rglob(".git") if path.is_dir()]
+    if leaked_git:
+        raise RuntimeError(".git leaked into release bundle: %s" % leaked_git[0])
 
-    zip_path = out_dir / (name + ".zip")
+    zip_path = out_dir / ("intersci-grad-v%s.zip" % version)
     if zip_path.exists():
         zip_path.unlink()
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as archive:
         for path in sorted(build_dir.rglob("*")):
             if path.is_file():
-                archive.write(path, arcname=str(Path(name) / path.relative_to(build_dir)))
+                archive.write(path, arcname=str(Path(BUNDLE_DIR) / path.relative_to(build_dir)))
 
     digest = hashlib.sha256(zip_path.read_bytes()).hexdigest()
     sums_path = out_dir / "SHA256SUMS.txt"
@@ -230,6 +261,7 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     files = _collect_files(root)
     findings = _scan_secrets(root, files)
+    issues.extend(_check_text(root, files))
     if issues:
         for issue in issues:
             print("ERROR: %s" % issue, file=sys.stderr)

@@ -48,3 +48,21 @@ def test_collect_excludes_development_files():
 def test_secret_scan_is_clean():
     files = mr._collect_files(_ROOT)
     assert mr._scan_secrets(_ROOT, files) == []
+
+
+def test_bundle_dir_matches_skill_name():
+    """解压后目录名必须等于 frontmatter name，DSH 才能发现技能。"""
+    assert mr.BUNDLE_DIR == "intersci-grad"
+
+
+def test_text_check_rejects_binary(tmp_path):
+    bad = tmp_path / "bad.md"
+    bad.write_bytes(b"\x00\x01binary")
+    issues = mr._check_text(tmp_path, [bad])
+    assert issues and "NUL" in issues[0]
+
+
+def test_text_check_accepts_utf8(tmp_path):
+    good = tmp_path / "good.md"
+    good.write_text("中文 UTF-8 文本\n", encoding="utf-8")
+    assert mr._check_text(tmp_path, [good]) == []

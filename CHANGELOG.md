@@ -204,5 +204,10 @@
 121. 📦 发布整理：项目名统一为 `intersci-grad`；新增 `SECURITY.md`、`RELEASE_NOTES.md`、`.github/workflows/ci.yml`、`scripts/make_release.py`；发布包自动排除 `.env` / `tests` / `docs` / 缓存，并做密钥扫描。
 122. 🧪 CI 离线稳定：设置 `SKIP_NETWORK_TESTS=1` 时跳过实网用例，避免多平台 CI 因外部网络抖动误报。
 123. 🔐 密钥边界：`.env.example` 明确“核心功能不需要 Key，仅旧版 SCP 工具可选”；安装与发布流程都显式排除 `.env`。
+124. 🧹 平台审核修复：提交被驳回「`.git/index` 内容与后缀不符」——根因是直接上传了整个工作目录；发布包只含运行文件，`.git/`、`.env`、缓存、`dist/` 一律不入包。
+125. 📦 发布包顶层目录固定为 `intersci-grad/`（原来带版本号 `intersci-grad-v5.0.0/`，解压后目录名与 frontmatter `name` 不一致，DSH 会找不到技能）。
+126. ✅ 新增 `scripts/check_submission.py`：上传前按平台口径逐文件检查 `.git`/`.env`/缓存/字节码/内嵌压缩包，并要求无 NUL、合法 UTF-8；失败时列出文件与字节偏移。
+127. 🔒 `scripts/make_release.py` 增加文本性校验：二进制或非 UTF-8 文件直接拒绝构建；构建后目录名与 `SKILL.md` 的 `name` 对账。新增 `tests/test_check_submission.py` 与对应发布测试。
+128. 📖 README 补「5 分钟装好（含文献检索）」：四步安装表（每步标注跳过后果）、三条检索链路（SCP / Crossref / mock 不可用）、`is_mock` 判据、可直接粘贴的 Agent 检索指令、故障排查表；DISTRIBUTION §4 验收由 5 步扩到 7 步，§5 补两类故障。纯文档变更，不动代码与版本号。
 
 **当前版本：5.0.0-skill**（与 SKILL.md frontmatter、pyproject.toml 三处一致，由 scripts/check_consistency.py 对账；变更历史只追加不改写）

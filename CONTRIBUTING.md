@@ -33,6 +33,7 @@ Python >= 3.8。核心校验器 `scripts/validate_grad.py` 只用标准库。
 python scripts/check_consistency.py          # 版本/配置/文档对账
 python -m pytest -q                          # 全量测试
 python scripts/make_release.py --check-only  # 发布包自检（不写文件）
+python scripts/check_submission.py dist/intersci-grad-v5.0.0.zip  # 上传前文本审核自检
 ```
 
 如果只改了某几份样例，至少跑：

@@ -150,3 +150,27 @@ class TestMockPaperYear:
     def test_mock_paper_year_none(self):
         paper = scp_tools._mock_paper("sciverse", "Patent", "test", 1)
         assert paper["year"] is None
+
+
+class TestMCPProtocolVersionHeader:
+    """回归：MCP Streamable HTTP 要求初始化后的请求带 MCP-Protocol-Version。"""
+
+    def test_call_gateway_sends_protocol_version(self, monkeypatch):
+        captured = {}
+
+        def fake_initialize(url, headers):
+            captured["initialize"] = dict(headers)
+            return True, {}
+
+        def fake_tools_call(url, tool_name, arguments, headers):
+            captured["tools_call"] = dict(headers)
+            return 200, None
+
+        monkeypatch.setenv("SCP_HUB_API_KEY", "sk-test")
+        monkeypatch.setattr(scp_tools, "_mcp_initialize", fake_initialize)
+        monkeypatch.setattr(scp_tools, "_mcp_tools_call", fake_tools_call)
+
+        scp_tools.call_gateway("sciverse", "test query", 1)
+
+        assert captured["initialize"]["MCP-Protocol-Version"] == scp_tools.MCP_PROTOCOL_VERSION
+        assert captured["tools_call"]["MCP-Protocol-Version"] == scp_tools.MCP_PROTOCOL_VERSION
