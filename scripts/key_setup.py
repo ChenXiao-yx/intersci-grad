@@ -19,7 +19,7 @@ from pathlib import Path
 # 必填 Key 列表：变量名 → (申请地址, 用途说明)
 REQUIRED_KEYS = {
     "SCP_HUB_API_KEY": (
-        "https://scp.intern-ai.org.cn",
+        "https://discovery.intern-ai.org.cn/user-center/system?tab=apikey",
         "SCP 平台通用 API Key（11 个数据工具共用，10 个 MCP 端点，用于文献检索与证据采集）",
     ),
 }

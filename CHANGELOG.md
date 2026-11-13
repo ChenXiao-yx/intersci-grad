@@ -209,5 +209,6 @@
 126. ✅ 新增 `scripts/check_submission.py`：上传前按平台口径逐文件检查 `.git`/`.env`/缓存/字节码/内嵌压缩包，并要求无 NUL、合法 UTF-8；失败时列出文件与字节偏移。
 127. 🔒 `scripts/make_release.py` 增加文本性校验：二进制或非 UTF-8 文件直接拒绝构建；构建后目录名与 `SKILL.md` 的 `name` 对账。新增 `tests/test_check_submission.py` 与对应发布测试。
 128. 📖 README 补「5 分钟装好（含文献检索）」：四步安装表（每步标注跳过后果）、三条检索链路（SCP / Crossref / mock 不可用）、`is_mock` 判据、可直接粘贴的 Agent 检索指令、故障排查表；DISTRIBUTION §4 验收由 5 步扩到 7 步，§5 补两类故障。纯文档变更，不动代码与版本号。
+129. 🧑‍🎓 README 改为「小白路径优先」：先给可直接粘贴给任意 agent 的安装/配 Key/自检模板（4 个空），再给专业手动步骤；不再预设 DSH，补 DSH / Claude Code / Cursor / ChatGPT 等加载方式对照表与「只能传文件」降级说明；SCP Key 引导地址统一改为 Key 页面 `discovery.intern-ai.org.cn/user-center/system?tab=apikey`（`.env.example`、`key_setup.py` 同步）。
 
 **当前版本：5.0.0-skill**（与 SKILL.md frontmatter、pyproject.toml 三处一致，由 scripts/check_consistency.py 对账；变更历史只追加不改写）
