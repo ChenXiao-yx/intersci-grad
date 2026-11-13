@@ -14,6 +14,9 @@ jobs:
   test:
     name: py${{ matrix.python-version }} / ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+    env:
+      # Windows runner 控制台默认 cp1252，脚本打印中文会 UnicodeEncodeError 直接退出 1
+      PYTHONIOENCODING: "utf-8"
     strategy:
       fail-fast: false
       matrix:
